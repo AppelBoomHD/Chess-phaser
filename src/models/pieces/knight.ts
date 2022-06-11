@@ -18,11 +18,16 @@ export class Knight extends Base {
      *  -2 +1
      *  +2 -1
      */
-    const possiblePosition = this.position;
-    possiblePosition.horizontal + 1;
-    possiblePosition.vertical + 2;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
+    const additions = [-2, -1, 1, 2];
+    for (const addX of additions) {
+      for (const addY of additions) {
+        if (addX !== addY && addX !== -addY) {
+          const position = { horizontal: this.position.horizontal + addX, vertical: this.position.vertical + addY } as Position;
+          if (this.checkInbounds(position)) {
+            possiblepositions.push(position);
+          }
+        }
+      }
     }
     return possiblepositions;
   }

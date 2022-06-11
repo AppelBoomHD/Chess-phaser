@@ -9,52 +9,19 @@ export class King extends Base {
   }
 
   possibleMovements() {
-    var possiblepositions = [];
-    // +1 +0, +1 +1, +0 +1, -1 +1, -1 0, -1 -1, 0 -1, +1 -1
-    var possiblePosition = this.position;
-    possiblePosition.horizontal + 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
+    const possibleMovements: Position[] = [];
+    const additions = [-1, 0, 1];
+    for (const addX of additions) {
+      for (const addY of additions) {
+        if (addX !== 0 || addY !== 0) {
+          const position = { horizontal: this.position.horizontal + addX, vertical: this.position.vertical + addY } as Position;
+          if (this.checkInbounds(position)) {
+            possibleMovements.push(position);
+          }
+        }
+      }
     }
-    possiblePosition = this.position;
-    possiblePosition.horizontal + 1;
-    possiblePosition.vertical + 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    possiblePosition = this.position;
-    possiblePosition.vertical + 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    possiblePosition = this.position;
-    possiblePosition.horizontal - 1;
-    possiblePosition.vertical + 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    possiblePosition = this.position;
-    possiblePosition.horizontal - 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    possiblePosition = this.position;
-    possiblePosition.horizontal - 1;
-    possiblePosition.vertical - 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    possiblePosition = this.position;
-    possiblePosition.vertical - 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    possiblePosition = this.position;
-    possiblePosition.horizontal + 1;
-    possiblePosition.vertical - 1;
-    if (this.checkInbounds(possiblePosition)) {
-      possiblepositions.push(possiblePosition)
-    }
-    return possiblepositions
+
+    return possibleMovements;
   }
 }

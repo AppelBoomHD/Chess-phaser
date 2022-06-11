@@ -8,9 +8,21 @@ export class Queen extends Base {
   }
 
   possibleMovements() {
-    const possiblepositions = [];
-    possiblepositions.push(...this.checkdiagonalSpace())
-    possiblepositions.push(...this.checkStraightSpace())
-    return possiblepositions
+    const possiblePositions: Position[] = [];
+    const plusminusArray = [-1, 0, 1];
+    for (const plusminusX of plusminusArray) {
+      for (const plusminusY of plusminusArray) {
+        if (plusminusX !== 0 || plusminusY !== 0) {
+          let add = 1;
+          let position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY } as Position;
+          while (this.checkInbounds(position)) {
+            position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
+            possiblePositions.push(position);
+            ++add;
+          }
+        }
+      }
+    }
+    return possiblePositions;
   }
 }

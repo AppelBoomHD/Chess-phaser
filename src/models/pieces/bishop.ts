@@ -8,6 +8,19 @@ export class Bishop extends Base {
   }
 
   possibleMovements() {
-    return this.checkdiagonalSpace()
+    const possiblePositions: Position[] = [];
+    const plusminusArray = [-1, 1];
+    for (const plusminusX of plusminusArray) {
+      for (const plusminusY of plusminusArray) {
+        let add = 1;
+        let position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY } as Position;
+        while (this.checkInbounds(position)) {
+          position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
+          possiblePositions.push(position);
+          ++add;
+        }
+      }
+    }
+    return possiblePositions;
   }
 }
