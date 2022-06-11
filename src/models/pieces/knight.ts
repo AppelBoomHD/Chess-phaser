@@ -3,8 +3,8 @@ import { Base } from "./base";
 import { PIECE_NAME } from "../../environment";
 
 export class Knight extends Base {
-  constructor(scene: Phaser.Scene, id: string, white: boolean, right: boolean, position: Position) {
-    super(scene, id, right ? PIECE_NAME.KNIGHT_RIGHT : PIECE_NAME.KNIGHT_LEFT, white, position);
+  constructor(scene: Phaser.Scene, white: boolean, right: boolean, position: Position) {
+    super(scene, right ? PIECE_NAME.KNIGHT_RIGHT : PIECE_NAME.KNIGHT_LEFT, white, position);
   }
 
   possibleMovements() {

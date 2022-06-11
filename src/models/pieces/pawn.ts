@@ -5,13 +5,18 @@ import { PIECE_NAME } from "../../environment";
 export class Pawn extends Base {
   private firstmove = true;
 
-  constructor(scene: Phaser.Scene, id: string, white: boolean, position: Position) {
-    super(scene, id, PIECE_NAME.PAWN, white, position);
+  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
+    super(scene, PIECE_NAME.PAWN, white, position);
   }
 
-  override move(toPos: Position) {
-    this.firstmove = false;
-    super.move(toPos);
+  override move() {
+    const didMove = super.move();
+
+    if (didMove) {
+      this.firstmove = false;
+    }
+
+    return didMove;
   }
 
   possibleMovements() {

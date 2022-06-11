@@ -4,17 +4,18 @@ import { CoordinateHelper } from "../../helpers/coordinateHelper";
 import { Position } from "../../interfaces/position";
 
 export abstract class Base {
+  private static id = 0;
   private _fullname: string;
   private _white: boolean;
   private _position: Position;
   private _gameObject: Phaser.GameObjects.Image;
 
-  constructor(scene: Scene, id: string, name: PIECE_NAME, white: boolean, position: Position) {
+  constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position) {
     this._position = position;
     this._fullname = `${name}_${white ? 'white' : 'black'}`;
     this._white = white;
     const coordinate = this.coordinate
-    this._gameObject = scene.add.sprite(coordinate.x, coordinate.y, this.fullname).setName(id);
+    this._gameObject = scene.add.sprite(coordinate.x, coordinate.y, this.fullname).setName(`${Base.id++}`);
   }
 
   public get fullname(): string {
@@ -34,16 +35,31 @@ export abstract class Base {
   }
 
   public get coordinate() {
-    return CoordinateHelper.getCoordinate(this.position);
-  }
-
-  move(toPos: Position): void {
-    this._position = toPos;
+    return CoordinateHelper.getCoordinate(this._position);
   }
 
   abstract possibleMovements(): Position[]
 
-  public checkInbounds(position: Position) {
+  move() {
+    const newPosition = CoordinateHelper.getPosition({ x: this._gameObject.x, y: this._gameObject.y });
+    if (this.checkPosition(newPosition)) {
+      this._position = newPosition;
+      this.changeCoordinate();
+      return true;
+    }
+    this.changeCoordinate();
+    return false;
+  }
+
+  select() {
+    this._gameObject.setTint(+import.meta.env.VITE_COLOR_TINT);
+  }
+
+  deselect() {
+    this._gameObject.clearTint();
+  }
+
+  protected checkInbounds(position: Position) {
     if (position.horizontal <= 8 && position.horizontal >= 1 && position.vertical <= 8 && position.vertical >= 1) {
       return true;
     }
@@ -138,5 +154,17 @@ export abstract class Base {
       i++;
     }
     return possiblepositions;
+  }
+
+  private changeCoordinate() {
+    const newCoordinate = this.coordinate;
+    this._gameObject.setPosition(newCoordinate.x, newCoordinate.y);
+  }
+
+  private checkPosition(position: Position) {
+    const locations = this.possibleMovements();
+    return locations.some((location) =>
+      location.vertical === position.vertical && location.horizontal === position.horizontal
+    );
   }
 }

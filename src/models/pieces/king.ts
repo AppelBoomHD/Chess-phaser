@@ -4,8 +4,8 @@ import { PIECE_NAME } from "../../environment";
 
 
 export class King extends Base {
-  constructor(scene: Phaser.Scene, id: string, white: boolean, position: Position) {
-    super(scene, id, PIECE_NAME.KING, white, position);
+  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
+    super(scene, PIECE_NAME.KING, white, position);
   }
 
   possibleMovements() {

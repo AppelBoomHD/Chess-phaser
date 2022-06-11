@@ -3,8 +3,8 @@ import { Base } from "./base";
 import { PIECE_NAME } from "../../environment";
 
 export class Queen extends Base {
-  constructor(scene: Phaser.Scene, id: string, white: boolean, position: Position) {
-    super(scene, id, PIECE_NAME.QUEEN, white, position);
+  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
+    super(scene, PIECE_NAME.QUEEN, white, position);
   }
 
   possibleMovements() {
