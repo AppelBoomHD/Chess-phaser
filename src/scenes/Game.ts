@@ -101,7 +101,7 @@ export default class Game extends Phaser.Scene {
     this.input.on('dragstart', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) => {
       const piece = this.allPieces[+gameObject.name];
 
-      this.selectedPiece?.gameObject.clearTint();
+      this.selectedPiece?.deselect();
 
       if (this.selectedPiece !== piece) {
         this.selectedPiece = piece;

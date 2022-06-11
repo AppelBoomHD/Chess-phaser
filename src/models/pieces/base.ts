@@ -1,21 +1,25 @@
 import { Scene } from "phaser";
-import { PIECE_NAME } from "../../environment";
+import { PIECE_NAME, SIZE_SQUARE } from "../../environment";
 import { CoordinateHelper } from "../../helpers/coordinateHelper";
 import { Position } from "../../interfaces/position";
 
 export abstract class Base {
   private static id = 0;
+  private static group: Phaser.GameObjects.Group;
+
+  private scene: Scene;
   private _fullname: string;
   private _white: boolean;
   private _position: Position;
   private _gameObject: Phaser.GameObjects.Image;
 
   constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position) {
+    this.scene = scene;
     this._position = position;
     this._fullname = `${name}_${white ? 'white' : 'black'}`;
     this._white = white;
     const coordinate = this.coordinate
-    this._gameObject = scene.add.sprite(coordinate.x, coordinate.y, this.fullname).setName(`${Base.id++}`);
+    this._gameObject = this.scene.add.sprite(coordinate.x, coordinate.y, this.fullname).setName(`${Base.id++}`);
   }
 
   public get fullname(): string {
@@ -53,10 +57,17 @@ export abstract class Base {
 
   select() {
     this._gameObject.setTint(+import.meta.env.VITE_COLOR_TINT);
+    Base.group = this.scene.add.group();
+    const positions = this.possibleMovements();
+    for (const position of positions) {
+      const coordinate = CoordinateHelper.getCoordinate({ horizontal: position.horizontal, vertical: position.vertical });
+      Base.group.add(this.scene.add.rectangle(coordinate.x, coordinate.y, SIZE_SQUARE, SIZE_SQUARE, +import.meta.env.VITE_COLOR_TINT, 0.25))
+    }
   }
 
   deselect() {
     this._gameObject.clearTint();
+    Base.group.destroy(true);
   }
 
   protected checkInbounds(position: Position) {
