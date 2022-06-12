@@ -24,4 +24,9 @@ export class King extends Base {
 
     return possibleMovements;
   }
+
+  flash() {
+    this.gameObject.setTint(+import.meta.env.VITE_COLOR_DANGER);
+    setTimeout(() => this.gameObject.clearTint(), 250);
+  }
 }

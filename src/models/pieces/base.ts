@@ -10,21 +10,28 @@ export abstract class Base {
   private static group: Phaser.GameObjects.Group;
 
   private scene: Scene;
-  private gameObject: Phaser.GameObjects.Image;
   private coordinate: Coordinate;
   private fullname: string;
 
+  private _gameObject: Phaser.GameObjects.Image;
+  private _id: number;
   private _white: boolean;
   private _position: Position;
   private _moves: Position[] = [];
 
   constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position) {
+    if (Base.id === 16) Base.id = 0;
+    this._id = Base.id++;
     this.scene = scene;
     this.fullname = `${name}_${white ? 'white' : 'black'}`;
     this._white = white;
     this._position = position;
     this.coordinate = CoordinateHelper.getCoordinate(position);
-    this.gameObject = this.scene.add.sprite(this.coordinate.x, this.coordinate.y, this.fullname).setName(`${Base.id++}`);
+    this._gameObject = this.scene.add.sprite(this.coordinate.x, this.coordinate.y, this.fullname).setName(`${this.id}`);
+  }
+
+  get id() {
+    return this._id;
   }
 
   get white() {
@@ -37,6 +44,10 @@ export abstract class Base {
 
   get moves() {
     return this._moves;
+  }
+
+  protected get gameObject() {
+    return this._gameObject;
   }
 
   protected abstract possibleMovements(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position): Position[]

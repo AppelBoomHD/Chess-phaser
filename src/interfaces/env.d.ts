@@ -5,6 +5,7 @@ interface ImportMetaEnv {
     readonly VITE_COLOR_BLACK_SQUARE: string
     readonly VITE_COLOR_WHITE_SQUARE: string
     readonly VITE_COLOR_TINT: string
+    readonly VITE_COLOR_DANGER: string
 }
 
 interface ImportMeta {

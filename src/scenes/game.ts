@@ -11,12 +11,10 @@ import { Queen } from '../models/pieces/queen';
 import { Rook } from '../models/pieces/rook';
 
 export default class Game extends Phaser.Scene {
-  private whitesTurn = false;
-
-  private whitePieces!: Base[];
-  private blackPieces!: Base[];
-  private allPieces!: Base[];
   private selectedPiece?: Base;
+
+  private friendlyPieces: (Base | undefined)[] = [];
+  private enemyPieces: (Base | undefined)[] = [];
 
   constructor() {
     super('GameScene');
@@ -53,7 +51,7 @@ export default class Game extends Phaser.Scene {
   }
 
   private drawPieces() {
-    this.whitePieces = [
+    this.friendlyPieces = [
       new Pawn(this, true, { vertical: 2, horizontal: 1 }),
       new Pawn(this, true, { vertical: 2, horizontal: 2 }),
       new Pawn(this, true, { vertical: 2, horizontal: 3 }),
@@ -72,7 +70,7 @@ export default class Game extends Phaser.Scene {
       new Rook(this, true, { vertical: 1, horizontal: 8 })
     ];
 
-    this.blackPieces = [
+    this.enemyPieces = [
       new Pawn(this, false, { vertical: 7, horizontal: 1 }),
       new Pawn(this, false, { vertical: 7, horizontal: 2 }),
       new Pawn(this, false, { vertical: 7, horizontal: 3 }),
@@ -90,35 +88,33 @@ export default class Game extends Phaser.Scene {
       new Knight(this, false, true, { vertical: 8, horizontal: 7 }),
       new Rook(this, false, { vertical: 8, horizontal: 8 })
     ];
-
-    this.allPieces = [...this.whitePieces, ...this.blackPieces];
   }
 
   private startGame() {
-    this.switchTurn();
+    this.setAllMoves();
+    this.activatePieces();
     this.addListeners();
+  }
+
+  private setAllMoves() {
+    const friendlyPositions = this.friendlyPieces.filter((piece): piece is Base => piece !== undefined).map((piece) => piece.position);
+    const enemyPositions = this.enemyPieces.filter((piece): piece is Base => piece !== undefined).map((piece) => piece.position);
+    const doubleMovedPawn = this.enemyPieces.find((piece) => (piece instanceof Pawn) && piece.justDoubleMoved)?.position;
+
+    this.friendlyPieces.forEach((piece) => {
+      if (piece) {
+        this.setMoves(piece, friendlyPositions, enemyPositions, doubleMovedPawn);
+      }
+    });
   }
 
   private addListeners() {
     this.input.on('dragstart', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) => {
-      const piece = this.allPieces[+gameObject.name];
+      const piece = this.friendlyPieces[+gameObject.name]!;
 
       if (this.selectedPiece !== piece) {
         this.selectedPiece?.deselect();
         this.selectedPiece = piece;
-        const friendlyPositions = (this.selectedPiece.white ? this.whitePieces : this.blackPieces).map((piece) => piece.position);
-        if (this.selectedPiece instanceof Knight || piece instanceof King) {
-          this.selectedPiece.setMoves(friendlyPositions);
-        } else {
-          const enemyPieces = this.selectedPiece.white ? this.blackPieces : this.whitePieces;
-          const enemyPositions = enemyPieces.map((piece) => piece.position);
-          if (piece instanceof Pawn) {
-            const doubleMovedPawn = enemyPieces.find((piece) => (piece instanceof Pawn) && piece.justDoubleMoved)?.position;
-            piece.setMoves(friendlyPositions, enemyPositions, doubleMovedPawn);
-          } else {
-            piece.setMoves(friendlyPositions, enemyPositions);
-          }
-        }
         this.selectedPiece.select();
       }
     });
@@ -129,21 +125,21 @@ export default class Game extends Phaser.Scene {
     });
 
     this.input.on('dragend', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image, _dragX: number, _dragY: number) => {
-      const piece = this.allPieces[+gameObject.name];
+      const piece = this.selectedPiece!;
       const newPosition = CoordinateHelper.getPosition({ x: gameObject.x, y: gameObject.y });
 
-      if (!this.checkPosition(piece, newPosition)) {
-        return piece.moveBack();
-      }
-
-      const enemyPieces = piece.white ? this.blackPieces : this.whitePieces;
-      const otherPiece = enemyPieces.findIndex((piece) =>
+      const otherPiece = this.enemyPieces.findIndex((piece) => piece &&
         (piece.position.horizontal === newPosition.horizontal && piece.position.vertical === newPosition.vertical) ||
         ((piece instanceof Pawn) && piece.justDoubleMoved && (piece.position.vertical + (piece.white ? -1 : 1)) === newPosition.vertical) &&
         piece.position.horizontal === newPosition.horizontal
       );
+
+      if (!this.checkPosition(piece, otherPiece, newPosition)) {
+        return piece.moveBack();
+      }
+
       if (otherPiece >= 0) {
-        this.strike(otherPiece, enemyPieces);
+        this.strike(otherPiece);
       }
 
       this.move(piece, newPosition);
@@ -151,29 +147,73 @@ export default class Game extends Phaser.Scene {
   }
 
   private switchTurn() {
-    if (this.whitesTurn) {
-      this.blackPieces.forEach((piece) => {
-        if (piece instanceof Pawn) {
-          piece.reset();
-        }
-        piece.enableInteractive();
-      });
-      this.whitePieces.forEach((piece) => {
-        piece.disableInteractive();
-      });
-      this.whitesTurn = false;
+    const enemyPieces = this.friendlyPieces;
+    this.friendlyPieces = this.enemyPieces;
+    this.enemyPieces = enemyPieces;
+
+    this.activatePieces();
+  }
+
+  private activatePieces() {
+    this.friendlyPieces.forEach((piece) => {
+      piece?.enableInteractive();
+    });
+    this.enemyPieces.forEach((piece) => {
+      piece?.disableInteractive();
+    });
+  }
+
+  private setMoves(piece: Base, friendlyPositions: Position[], enemyPositions: Position[], doubleMovedPawn?: Position) {
+    if (piece instanceof Knight || piece instanceof King) {
+      piece.setMoves(friendlyPositions);
     } else {
-      this.whitePieces.forEach((piece) => {
-        if (piece instanceof Pawn) {
-          piece.reset();
-        }
-        piece.enableInteractive();
-      });
-      this.blackPieces.forEach((piece) => {
-        piece.disableInteractive();
-      });
-      this.whitesTurn = true;
+      if (piece instanceof Pawn) {
+        piece.reset();
+        piece.setMoves(friendlyPositions, enemyPositions, doubleMovedPawn);
+      } else {
+        piece.setMoves(friendlyPositions, enemyPositions);
+      }
     }
+  }
+
+  private isInCheck(id: number, otherPiece: number, newPosition: Position) {
+    const king = this.friendlyPieces[12]! as King;
+    let kingPosition: Position;
+    if (id === 12) {
+      kingPosition = newPosition;
+    } else {
+      kingPosition = king.position;
+    }
+
+    const friendlyPositions = this.friendlyPieces.map((piece) => piece?.position);
+    const enemyPositions = this.enemyPieces.map((piece) => piece?.position);
+    const doubleMovedPawn = this.enemyPieces.find((piece) => (piece instanceof Pawn) && piece.justDoubleMoved)?.position;
+
+    friendlyPositions[id] = newPosition;
+
+    if (otherPiece >= -1) {
+      enemyPositions[otherPiece] = undefined;
+    }
+
+    const friendlyPositionsFiltered = friendlyPositions.filter((position): position is Position => position !== undefined);
+    const enemyPositionsFiltered = enemyPositions.filter((position): position is Position => position !== undefined);
+
+    this.enemyPieces.forEach((piece) => {
+      if (piece) {
+        this.setMoves(piece, enemyPositionsFiltered, friendlyPositionsFiltered, doubleMovedPawn);
+      }
+    });
+
+    const inCheck = this.enemyPieces.some((piece) =>
+      piece && piece.id !== otherPiece && piece.moves.some((position) => position.horizontal === kingPosition.horizontal && position.vertical === kingPosition.vertical)
+    );
+
+    if (inCheck) {
+      king.flash();
+      this.setAllMoves();
+    }
+
+    return inCheck;
   }
 
   private move(piece: Base, position: Position) {
@@ -182,16 +222,16 @@ export default class Game extends Phaser.Scene {
     this.switchTurn();
   }
 
-  private strike(index: number, enemyPieces: Base[]) {
-    const piece = enemyPieces[index];
-    piece.destroy();
-    enemyPieces.splice(index, 1);
+  private strike(index: number) {
+    const piece = this.enemyPieces[index];
+    piece!.destroy();
+    this.enemyPieces[index] = undefined;
   }
 
-  private checkPosition(piece: Base, position: Position) {
+  private checkPosition(piece: Base, otherPiece: number, position: Position) {
     const locations = piece.moves;
     return locations.some((location) =>
       location.vertical === position.vertical && location.horizontal === position.horizontal
-    );
+    ) && !this.isInCheck(piece.id, otherPiece, position);
   }
 }
