@@ -10,43 +10,32 @@ export abstract class Base {
   private static group: Phaser.GameObjects.Group;
 
   private scene: Scene;
-  private _fullname: string;
+  private gameObject: Phaser.GameObjects.Image;
+  private coordinate: Coordinate;
+  private fullname: string;
+
   private _white: boolean;
   private _position: Position;
-  private _coordinate: Coordinate;
-  private _gameObject: Phaser.GameObjects.Image;
   private _moves: Position[] = [];
 
   constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position) {
     this.scene = scene;
-    this._fullname = `${name}_${white ? 'white' : 'black'}`;
+    this.fullname = `${name}_${white ? 'white' : 'black'}`;
     this._white = white;
     this._position = position;
-    this._coordinate = CoordinateHelper.getCoordinate(position);
-    this._gameObject = this.scene.add.sprite(this.coordinate.x, this.coordinate.y, this.fullname).setName(`${Base.id++}`);
+    this.coordinate = CoordinateHelper.getCoordinate(position);
+    this.gameObject = this.scene.add.sprite(this.coordinate.x, this.coordinate.y, this.fullname).setName(`${Base.id++}`);
   }
 
-  public get fullname(): string {
-    return this._fullname;
-  }
-
-  public get white(): boolean {
+  get white() {
     return this._white;
   }
 
-  public get position(): Position {
+  get position() {
     return this._position;
   }
 
-  public get gameObject(): Phaser.GameObjects.Image {
-    return this._gameObject;
-  }
-
-  public get coordinate() {
-    return this._coordinate;
-  }
-
-  public get moves(): Position[] {
+  get moves() {
     return this._moves;
   }
 
@@ -54,16 +43,16 @@ export abstract class Base {
 
   move(toPosition: Position) {
     this._position = toPosition;
-    this._coordinate = CoordinateHelper.getCoordinate(toPosition);
-    this._gameObject.setPosition(this._coordinate.x, this._coordinate.y);
+    this.coordinate = CoordinateHelper.getCoordinate(toPosition);
+    this.gameObject.setPosition(this.coordinate.x, this.coordinate.y);
   }
 
   moveBack() {
-    this._gameObject.setPosition(this._coordinate.x, this._coordinate.y);
+    this.gameObject.setPosition(this.coordinate.x, this.coordinate.y);
   }
 
   select() {
-    this._gameObject.setTint(+import.meta.env.VITE_COLOR_TINT);
+    this.gameObject.setTint(+import.meta.env.VITE_COLOR_TINT);
     Base.group = this.scene.add.group();
     for (const position of this._moves) {
       const coordinate = CoordinateHelper.getCoordinate({ horizontal: position.horizontal, vertical: position.vertical });
@@ -72,12 +61,12 @@ export abstract class Base {
   }
 
   deselect() {
-    this._gameObject.clearTint();
+    this.gameObject.clearTint();
     Base.group.destroy(true);
   }
 
   destroy() {
-    this._gameObject.destroy(true);
+    this.gameObject.destroy(true);
   }
 
   setMoves(friendlyPositions: Position[], enemyPositions?: Position[]) {
@@ -85,11 +74,11 @@ export abstract class Base {
   }
 
   enableInteractive() {
-    this._gameObject.setInteractive({ draggable: true, useHandCursor: true });
+    this.gameObject.setInteractive({ draggable: true, useHandCursor: true });
   }
 
   disableInteractive() {
-    this._gameObject.disableInteractive();
+    this.gameObject.disableInteractive();
   }
 
   protected isInbound(position: Position) {
