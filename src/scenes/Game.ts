@@ -107,11 +107,11 @@ export default class Game extends Phaser.Scene {
         this.selectedPiece?.deselect();
         this.selectedPiece = piece;
         const friendlyPositions = (this.selectedPiece.white ? this.whitePieces : this.blackPieces).map((piece) => piece.position);
-        if (piece instanceof Pawn) {
+        if (this.selectedPiece instanceof Knight || piece instanceof King) {
+          this.selectedPiece.setMoves(friendlyPositions);
+        } else {
           const enemyPositions = (this.selectedPiece.white ? this.blackPieces : this.whitePieces).map((piece) => piece.position);
           piece.setMoves(friendlyPositions, enemyPositions);
-        } else {
-          this.selectedPiece.setMoves(friendlyPositions);
         }
         this.selectedPiece.select();
       }
