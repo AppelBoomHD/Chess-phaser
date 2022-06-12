@@ -8,14 +8,14 @@ export class King extends Base {
     super(scene, PIECE_NAME.KING, white, position);
   }
 
-  possibleMovements() {
+  protected possibleMovements(friendlyPositions: Position[]) {
     const possibleMovements: Position[] = [];
     const additions = [-1, 0, 1];
     for (const addX of additions) {
       for (const addY of additions) {
         if (addX !== 0 || addY !== 0) {
           const position = { horizontal: this.position.horizontal + addX, vertical: this.position.vertical + addY } as Position;
-          if (this.checkInbounds(position)) {
+          if (this.isInbound(position) && !this.isOccupied(position, friendlyPositions)) {
             possibleMovements.push(position);
           }
         }

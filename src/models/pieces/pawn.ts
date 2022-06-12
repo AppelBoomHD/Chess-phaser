@@ -9,34 +9,36 @@ export class Pawn extends Base {
     super(scene, PIECE_NAME.PAWN, white, position);
   }
 
-  override move() {
-    const didMove = super.move();
-
-    if (didMove) {
-      this.firstmove = false;
-    }
-
-    return didMove;
+  override move(toPosition: Position) {
+    this.firstmove = false;
+    super.move(toPosition);
   }
 
-  possibleMovements() {
-    var moveAmount = 1;
-    var possiblepositions = [];
-    if (this.firstmove) {
-      moveAmount = 2;
-    }
+  protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {
+    const possiblePositions: Position[] = [];
 
-    for (var i = 1; i <= moveAmount; i++) {
-      const possiblePostion = { horizontal: this.position.horizontal, vertical: this.position.vertical } as Position;
-      if (this.white) {
-        possiblePostion.vertical += i;
-      } else {
-        possiblePostion.vertical -= i;
+    const position = this.add(0, 1);
+    if (this.isInbound(position) && !this.isOccupied(position, [...friendlyPositions, ...enemyPositions])) {
+      possiblePositions.push(position);
+      if (this.firstmove) {
+        const position = this.add(0, 2);
+        if (this.isInbound(position) && !this.isOccupied(position, [...friendlyPositions, ...enemyPositions])) {
+          possiblePositions.push(position);
+        }
       }
-      possiblepositions.push(possiblePostion)
     }
 
-    return possiblepositions;
+    for (const add of [-1, 1]) {
+      const position = this.add(add, 1);
+      if (this.isOccupied(position, enemyPositions)) {
+        possiblePositions.push(position);
+      }
+    }
+
+    return possiblePositions;
   }
 
+  private add(addX: number, addY: number) {
+    return { horizontal: this.position.horizontal + addX, vertical: this.position.vertical + addY * (this.white ? +1 : -1) };
+  }
 }

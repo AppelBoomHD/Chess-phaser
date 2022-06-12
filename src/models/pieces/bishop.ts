@@ -7,17 +7,17 @@ export class Bishop extends Base {
     super(scene, PIECE_NAME.BISHOP, white, position);
   }
 
-  possibleMovements() {
+  protected possibleMovements(friendlyPositions: Position[]) {
     const possiblePositions: Position[] = [];
     const plusminusArray = [-1, 1];
     for (const plusminusX of plusminusArray) {
       for (const plusminusY of plusminusArray) {
         let add = 1;
         let position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY } as Position;
-        while (this.checkInbounds(position)) {
-          position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
+        while (this.isInbound(position) && !this.isOccupied(position, friendlyPositions)) {
           possiblePositions.push(position);
           ++add;
+          position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
         }
       }
     }

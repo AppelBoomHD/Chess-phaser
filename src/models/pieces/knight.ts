@@ -7,7 +7,7 @@ export class Knight extends Base {
     super(scene, right ? PIECE_NAME.KNIGHT_RIGHT : PIECE_NAME.KNIGHT_LEFT, white, position);
   }
 
-  possibleMovements() {
+  protected possibleMovements(friendlyPositions: Position[]) {
     const possiblepositions = [];
     /**
      *  +1 +2,
@@ -23,7 +23,7 @@ export class Knight extends Base {
       for (const addY of additions) {
         if (addX !== addY && addX !== -addY) {
           const position = { horizontal: this.position.horizontal + addX, vertical: this.position.vertical + addY } as Position;
-          if (this.checkInbounds(position)) {
+          if (this.isInbound(position) && !this.isOccupied(position, friendlyPositions)) {
             possiblepositions.push(position);
           }
         }

@@ -7,7 +7,7 @@ export class Rook extends Base {
     super(scene, PIECE_NAME.ROOK, white, position);
   }
 
-  possibleMovements() {
+  protected possibleMovements(friendlyPositions: Position[]) {
     const possiblePositions: Position[] = [];
     const plusminusArray = [-1, 0, 1];
     for (const plusminusX of plusminusArray) {
@@ -15,10 +15,10 @@ export class Rook extends Base {
         if (plusminusX !== plusminusY && plusminusX !== -plusminusY) {
           let add = 1;
           let position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY } as Position;
-          while (this.checkInbounds(position)) {
-            position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
+          while (this.isInbound(position) && !this.isOccupied(position, friendlyPositions)) {
             possiblePositions.push(position);
             ++add;
+            position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
           }
         }
       }

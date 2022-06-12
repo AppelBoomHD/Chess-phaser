@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { PIECE_NAME, SIZE_PIECE, SIZE_SQUARE } from '../environment';
+import { CoordinateHelper } from '../helpers/coordinateHelper';
+import { Position } from '../interfaces/position';
 import { Base } from '../models/pieces/base';
 import { Bishop } from '../models/pieces/bishop';
 import { King } from '../models/pieces/king';
@@ -101,33 +103,42 @@ export default class Game extends Phaser.Scene {
     this.input.on('dragstart', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) => {
       const piece = this.allPieces[+gameObject.name];
 
-      this.selectedPiece?.deselect();
-
       if (this.selectedPiece !== piece) {
+        this.selectedPiece?.deselect();
         this.selectedPiece = piece;
+        const friendlyPositions = (this.selectedPiece.white ? this.whitePieces : this.blackPieces).map((piece) => piece.position);
+        if (piece instanceof Pawn) {
+          const enemyPositions = (this.selectedPiece.white ? this.blackPieces : this.whitePieces).map((piece) => piece.position);
+          piece.setMoves(friendlyPositions, enemyPositions);
+        } else {
+          this.selectedPiece.setMoves(friendlyPositions);
+        }
         this.selectedPiece.select();
-      } else {
-        this.selectedPiece = undefined;
       }
     });
 
     this.input.on('drag', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image, dragX: number, dragY: number) => {
-      const piece = this.allPieces[+gameObject.name];
-      if (this.selectedPiece !== piece) {
-        this.selectedPiece = piece;
-        this.selectedPiece.select();
-      }
       gameObject.x = dragX;
       gameObject.y = dragY;
     });
 
     this.input.on('dragend', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image, _dragX: number, _dragY: number) => {
       const piece = this.allPieces[+gameObject.name];
+      const newPosition = CoordinateHelper.getPosition({ x: gameObject.x, y: gameObject.y });
 
-      if (piece.move()) {
-        piece.deselect();
-        this.switchTurn();
+      if (!this.checkPosition(piece, newPosition)) {
+        return piece.moveBack();
       }
+
+      const enemyPieces = piece.white ? this.blackPieces : this.whitePieces;
+      const otherPiece = enemyPieces.findIndex((piece) =>
+        piece.position.horizontal === newPosition.horizontal && piece.position.vertical === newPosition.vertical
+      );
+      if (otherPiece >= 0) {
+        this.strike(otherPiece, enemyPieces);
+      }
+
+      this.move(piece, newPosition);
     });
   }
 
@@ -149,5 +160,24 @@ export default class Game extends Phaser.Scene {
       });
       this.whitesTurn = true;
     }
+  }
+
+  private move(piece: Base, position: Position) {
+    piece.move(position);
+    piece.deselect();
+    this.switchTurn();
+  }
+
+  private strike(index: number, enemyPieces: Base[]) {
+    const piece = enemyPieces[index];
+    piece.destroy();
+    enemyPieces.splice(index, 1);
+  }
+
+  private checkPosition(piece: Base, position: Position) {
+    const locations = piece.moves;
+    return locations.some((location) =>
+      location.vertical === position.vertical && location.horizontal === position.horizontal
+    );
   }
 }

@@ -1,7 +1,9 @@
 import { Scene } from "phaser";
 import { PIECE_NAME, SIZE_SQUARE } from "../../environment";
 import { CoordinateHelper } from "../../helpers/coordinateHelper";
+import { Coordinate } from "../../interfaces/coordinate";
 import { Position } from "../../interfaces/position";
+import { Pawn } from "./pawn";
 
 export abstract class Base {
   private static id = 0;
@@ -11,15 +13,17 @@ export abstract class Base {
   private _fullname: string;
   private _white: boolean;
   private _position: Position;
+  private _coordinate: Coordinate;
   private _gameObject: Phaser.GameObjects.Image;
+  private _moves: Position[] = [];
 
   constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position) {
     this.scene = scene;
-    this._position = position;
     this._fullname = `${name}_${white ? 'white' : 'black'}`;
     this._white = white;
-    const coordinate = this.coordinate
-    this._gameObject = this.scene.add.sprite(coordinate.x, coordinate.y, this.fullname).setName(`${Base.id++}`);
+    this._position = position;
+    this._coordinate = CoordinateHelper.getCoordinate(position);
+    this._gameObject = this.scene.add.sprite(this.coordinate.x, this.coordinate.y, this.fullname).setName(`${Base.id++}`);
   }
 
   public get fullname(): string {
@@ -39,27 +43,29 @@ export abstract class Base {
   }
 
   public get coordinate() {
-    return CoordinateHelper.getCoordinate(this._position);
+    return this._coordinate;
   }
 
-  abstract possibleMovements(): Position[]
+  public get moves(): Position[] {
+    return this._moves;
+  }
 
-  move() {
-    const newPosition = CoordinateHelper.getPosition({ x: this._gameObject.x, y: this._gameObject.y });
-    if (this.checkPosition(newPosition)) {
-      this._position = newPosition;
-      this.changeCoordinate();
-      return true;
-    }
-    this.changeCoordinate();
-    return false;
+  protected abstract possibleMovements(friendlyPositions: Position[], enemyPositions?: Position[]): Position[]
+
+  move(toPosition: Position) {
+    this._position = toPosition;
+    this._coordinate = CoordinateHelper.getCoordinate(toPosition);
+    this._gameObject.setPosition(this._coordinate.x, this._coordinate.y);
+  }
+
+  moveBack() {
+    this._gameObject.setPosition(this._coordinate.x, this._coordinate.y);
   }
 
   select() {
     this._gameObject.setTint(+import.meta.env.VITE_COLOR_TINT);
     Base.group = this.scene.add.group();
-    const positions = this.possibleMovements();
-    for (const position of positions) {
+    for (const position of this._moves) {
       const coordinate = CoordinateHelper.getCoordinate({ horizontal: position.horizontal, vertical: position.vertical });
       Base.group.add(this.scene.add.rectangle(coordinate.x, coordinate.y, SIZE_SQUARE, SIZE_SQUARE, +import.meta.env.VITE_COLOR_TINT, 0.25))
     }
@@ -70,22 +76,19 @@ export abstract class Base {
     Base.group.destroy(true);
   }
 
-  protected checkInbounds(position: Position) {
-    if (position.horizontal <= 8 && position.horizontal >= 1 && position.vertical <= 8 && position.vertical >= 1) {
-      return true;
-    }
-    return false;
+  destroy() {
+    this._gameObject.destroy(true);
   }
 
-  private changeCoordinate() {
-    const newCoordinate = this.coordinate;
-    this._gameObject.setPosition(newCoordinate.x, newCoordinate.y);
+  setMoves(friendlyPositions: Position[], enemyPositions?: Position[]) {
+    this._moves = this.possibleMovements(friendlyPositions, enemyPositions);
   }
 
-  private checkPosition(position: Position) {
-    const locations = this.possibleMovements();
-    return locations.some((location) =>
-      location.vertical === position.vertical && location.horizontal === position.horizontal
-    );
+  protected isInbound(position: Position) {
+    return position.horizontal <= 8 && position.horizontal >= 1 && position.vertical <= 8 && position.vertical >= 1;
+  }
+
+  protected isOccupied(position: Position, occupiedPositions: Position[]) {
+    return occupiedPositions.some((pos) => pos.horizontal === position.horizontal && pos.vertical === position.vertical);
   }
 }
