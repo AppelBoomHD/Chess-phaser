@@ -144,19 +144,19 @@ export default class Game extends Phaser.Scene {
 
   private switchTurn() {
     if (this.whitesTurn) {
-      this.blackPieces.forEach(({ gameObject }) => {
-        gameObject.setInteractive({ draggable: true, useHandCursor: true })
+      this.blackPieces.forEach((piece) => {
+        piece.enableInteractive();
       });
-      this.whitePieces.forEach(({ gameObject }) => {
-        gameObject.disableInteractive();
+      this.whitePieces.forEach((piece) => {
+        piece.disableInteractive();
       });
       this.whitesTurn = false;
     } else {
-      this.whitePieces.forEach(({ gameObject }) => {
-        gameObject.setInteractive({ draggable: true, useHandCursor: true })
+      this.whitePieces.forEach((piece) => {
+        piece.enableInteractive();
       });
-      this.blackPieces.forEach(({ gameObject }) => {
-        gameObject.disableInteractive();
+      this.blackPieces.forEach((piece) => {
+        piece.disableInteractive();
       });
       this.whitesTurn = true;
     }

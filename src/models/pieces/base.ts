@@ -84,6 +84,14 @@ export abstract class Base {
     this._moves = this.possibleMovements(friendlyPositions, enemyPositions);
   }
 
+  enableInteractive() {
+    this._gameObject.setInteractive({ draggable: true, useHandCursor: true });
+  }
+
+  disableInteractive() {
+    this._gameObject.disableInteractive();
+  }
+
   protected isInbound(position: Position) {
     return position.horizontal <= 8 && position.horizontal >= 1 && position.vertical <= 8 && position.vertical >= 1;
   }
