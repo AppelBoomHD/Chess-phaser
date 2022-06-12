@@ -110,8 +110,14 @@ export default class Game extends Phaser.Scene {
         if (this.selectedPiece instanceof Knight || piece instanceof King) {
           this.selectedPiece.setMoves(friendlyPositions);
         } else {
-          const enemyPositions = (this.selectedPiece.white ? this.blackPieces : this.whitePieces).map((piece) => piece.position);
-          piece.setMoves(friendlyPositions, enemyPositions);
+          const enemyPieces = this.selectedPiece.white ? this.blackPieces : this.whitePieces;
+          const enemyPositions = enemyPieces.map((piece) => piece.position);
+          if (piece instanceof Pawn) {
+            const doubleMovedPawn = enemyPieces.find((piece) => (piece instanceof Pawn) && piece.justDoubleMoved)?.position;
+            piece.setMoves(friendlyPositions, enemyPositions, doubleMovedPawn);
+          } else {
+            piece.setMoves(friendlyPositions, enemyPositions);
+          }
         }
         this.selectedPiece.select();
       }
@@ -132,7 +138,9 @@ export default class Game extends Phaser.Scene {
 
       const enemyPieces = piece.white ? this.blackPieces : this.whitePieces;
       const otherPiece = enemyPieces.findIndex((piece) =>
-        piece.position.horizontal === newPosition.horizontal && piece.position.vertical === newPosition.vertical
+        (piece.position.horizontal === newPosition.horizontal && piece.position.vertical === newPosition.vertical) ||
+        ((piece instanceof Pawn) && piece.justDoubleMoved && (piece.position.vertical + (piece.white ? -1 : 1)) === newPosition.vertical) &&
+        piece.position.horizontal === newPosition.horizontal
       );
       if (otherPiece >= 0) {
         this.strike(otherPiece, enemyPieces);
@@ -145,6 +153,9 @@ export default class Game extends Phaser.Scene {
   private switchTurn() {
     if (this.whitesTurn) {
       this.blackPieces.forEach((piece) => {
+        if (piece instanceof Pawn) {
+          piece.reset();
+        }
         piece.enableInteractive();
       });
       this.whitePieces.forEach((piece) => {
@@ -153,6 +164,9 @@ export default class Game extends Phaser.Scene {
       this.whitesTurn = false;
     } else {
       this.whitePieces.forEach((piece) => {
+        if (piece instanceof Pawn) {
+          piece.reset();
+        }
         piece.enableInteractive();
       });
       this.blackPieces.forEach((piece) => {

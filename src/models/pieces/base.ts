@@ -39,7 +39,7 @@ export abstract class Base {
     return this._moves;
   }
 
-  protected abstract possibleMovements(friendlyPositions: Position[], enemyPositions?: Position[]): Position[]
+  protected abstract possibleMovements(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position): Position[]
 
   move(toPosition: Position) {
     this._position = toPosition;
@@ -69,8 +69,8 @@ export abstract class Base {
     this.gameObject.destroy(true);
   }
 
-  setMoves(friendlyPositions: Position[], enemyPositions?: Position[]) {
-    this._moves = this.possibleMovements(friendlyPositions, enemyPositions);
+  setMoves(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position) {
+    this._moves = this.possibleMovements(friendlyPositions, enemyPositions, doubleMovedPawn);
   }
 
   enableInteractive() {
