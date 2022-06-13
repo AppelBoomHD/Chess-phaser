@@ -4,7 +4,7 @@ import { PIECE_NAME } from "../../environment";
 
 export class Bishop extends Base {
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PIECE_NAME.BISHOP, white, position);
+    super(scene, PIECE_NAME.BISHOP, white, position, []);
   }
 
   protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {

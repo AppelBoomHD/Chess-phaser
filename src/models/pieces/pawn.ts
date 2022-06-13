@@ -4,27 +4,17 @@ import { PIECE_NAME } from "../../environment";
 
 export class Pawn extends Base {
   private firstmove = true;
-  private _justDoubleMoved = false;
 
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PIECE_NAME.PAWN, white, position);
-  }
-
-  get justDoubleMoved() {
-    return this._justDoubleMoved;
-  }
-
-  reset() {
-    this._justDoubleMoved = false;
+    const moves = white ? [
+      { ...position, vertical: position.vertical + 1 },
+      { ...position, vertical: position.vertical + 2 }
+    ] : [];
+    super(scene, PIECE_NAME.PAWN, white, position, moves);
   }
 
   override move(toPosition: Position) {
     if (this.firstmove) this.firstmove = false;
-
-    if (Math.abs(this.position.vertical - toPosition.vertical) >= 2) {
-      this._justDoubleMoved = true;
-    }
-
     super.move(toPosition);
   }
 
@@ -53,10 +43,7 @@ export class Pawn extends Base {
   }
 
   private canEnPassant(position: Position, doubleMovedPawn?: Position) {
-    console.log(this.white ? (position.vertical === 5) : (position.vertical === 4));
-    console.log(doubleMovedPawn)
-    return (this.white ? (position.vertical === 5) : (position.vertical === 4)) &&
-      doubleMovedPawn?.horizontal === position.horizontal && doubleMovedPawn?.vertical === position.vertical
+    return doubleMovedPawn && doubleMovedPawn.horizontal === position.horizontal && doubleMovedPawn.vertical === position.vertical
   }
 
   private add(addX: number, addY: number) {

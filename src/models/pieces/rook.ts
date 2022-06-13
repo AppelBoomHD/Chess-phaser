@@ -4,7 +4,7 @@ import { PIECE_NAME } from "../../environment";
 
 export class Rook extends Base {
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PIECE_NAME.ROOK, white, position);
+    super(scene, PIECE_NAME.ROOK, white, position, []);
   }
 
   protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {

@@ -3,7 +3,6 @@ import { PIECE_NAME, SIZE_SQUARE } from "../../environment";
 import { CoordinateHelper } from "../../helpers/coordinateHelper";
 import { Coordinate } from "../../interfaces/coordinate";
 import { Position } from "../../interfaces/position";
-import { Pawn } from "./pawn";
 
 export abstract class Base {
   private static id = 0;
@@ -12,15 +11,17 @@ export abstract class Base {
   private scene: Scene;
   private coordinate: Coordinate;
   private fullname: string;
+  private lastMoves: Position[] = [];
 
   private _gameObject: Phaser.GameObjects.Image;
   private _id: number;
   private _white: boolean;
   private _position: Position;
-  private _moves: Position[] = [];
+  private _moves: Position[];
 
-  constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position) {
+  constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position, moves: Position[]) {
     if (Base.id === 16) Base.id = 0;
+    this._moves = moves;
     this._id = Base.id++;
     this.scene = scene;
     this.fullname = `${name}_${white ? 'white' : 'black'}`;
@@ -81,7 +82,12 @@ export abstract class Base {
   }
 
   setMoves(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position) {
+    this.lastMoves = this._moves;
     this._moves = this.possibleMovements(friendlyPositions, enemyPositions, doubleMovedPawn);
+  }
+
+  setBackMoves() {
+    this._moves = this.lastMoves;
   }
 
   enableInteractive() {

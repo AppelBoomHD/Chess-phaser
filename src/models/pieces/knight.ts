@@ -4,20 +4,15 @@ import { PIECE_NAME } from "../../environment";
 
 export class Knight extends Base {
   constructor(scene: Phaser.Scene, white: boolean, right: boolean, position: Position) {
-    super(scene, right ? PIECE_NAME.KNIGHT_RIGHT : PIECE_NAME.KNIGHT_LEFT, white, position);
+    const moves = white ? [
+      { horizontal: position.horizontal + 1, vertical: position.vertical + 2 },
+      { horizontal: position.horizontal - 1, vertical: position.vertical + 2 }
+    ] : [];
+    super(scene, right ? PIECE_NAME.KNIGHT_RIGHT : PIECE_NAME.KNIGHT_LEFT, white, position, moves);
   }
 
   protected possibleMovements(friendlyPositions: Position[]) {
     const possiblepositions = [];
-    /**
-     *  +1 +2,
-     *  -1 +2,
-     *  -2 +1
-     *  -2 -1
-     *  -1 -2
-     *  -2 +1
-     *  +2 -1
-     */
     const additions = [-2, -1, 1, 2];
     for (const addX of additions) {
       for (const addY of additions) {
