@@ -33,7 +33,7 @@ export default abstract class Base {
     name: PieceName,
     white: boolean,
     position: Position,
-    moves: Position[]
+    moves: Position[],
   ) {
     this.id = Base.id;
     if (Base.id >= 15) {
@@ -55,7 +55,7 @@ export default abstract class Base {
   protected abstract possibleMovements(
     friendlyPositions: Position[],
     enemyPositions?: Position[],
-    doubleMovedPawn?: Position
+    doubleMovedPawn?: Position,
   ): Position[];
 
   move(toPosition: Position) {
@@ -83,8 +83,8 @@ export default abstract class Base {
           SIZE_SQUARE,
           SIZE_SQUARE,
           +import.meta.env.VITE_COLOR_TINT,
-          0.25
-        )
+          0.25,
+        ),
       );
     });
   }
@@ -126,7 +126,7 @@ export default abstract class Base {
 
   protected static isOccupied(position: Position, occupiedPositions: Position[]) {
     return occupiedPositions.some(
-      (pos) => pos.horizontal === position.horizontal && pos.vertical === position.vertical
+      (pos) => pos.horizontal === position.horizontal && pos.vertical === position.vertical,
     );
   }
 }

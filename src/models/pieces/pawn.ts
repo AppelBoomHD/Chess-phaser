@@ -23,7 +23,7 @@ export default class Pawn extends Base {
   protected possibleMovements(
     friendlyPositions: Position[],
     enemyPositions: Position[],
-    doubleMovedPawn?: Position
+    doubleMovedPawn?: Position,
   ) {
     const possiblePositions: Position[] = [];
     const allPositions = [...friendlyPositions, ...enemyPositions];

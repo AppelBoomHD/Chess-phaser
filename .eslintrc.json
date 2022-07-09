@@ -1,22 +1,13 @@
 {
-    "extends": [
-        "airbnb-base",
-        "airbnb-typescript/base",
-        "prettier"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "project": "./tsconfig.json"
-    },
-    "plugins": [
-        "@typescript-eslint",
-        "prettier"
-    ],
-    "rules": {
-        "no-unused-vars": "warn",
-        "no-mixed-operators": "off"
-    },
-    "ignorePatterns": [
-        "vite.config.ts"
-    ]
+  "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-mixed-operators": "off"
+  },
+  "ignorePatterns": ["vite.config.ts"]
 }

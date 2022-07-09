@@ -48,7 +48,7 @@ export default class Game extends Phaser.Scene {
       +import.meta.env.VITE_SIZE_BOARD,
       SIZE_SQUARE,
       SIZE_SQUARE,
-      +import.meta.env.VITE_COLOR_WHITE_SQUARE
+      +import.meta.env.VITE_COLOR_WHITE_SQUARE,
     );
     grid.setAltFillStyle(+import.meta.env.VITE_COLOR_BLACK_SQUARE);
   }
@@ -118,7 +118,7 @@ export default class Game extends Phaser.Scene {
           this.selectedPiece = piece;
           this.selectedPiece.select();
         }
-      }
+      },
     );
 
     this.input.on(
@@ -127,13 +127,13 @@ export default class Game extends Phaser.Scene {
         _pointer: Phaser.Input.Pointer,
         gameObject: Phaser.GameObjects.Image,
         dragX: number,
-        dragY: number
+        dragY: number,
       ) => {
         // eslint-disable-next-line no-param-reassign
         gameObject.x = dragX;
         // eslint-disable-next-line no-param-reassign
         gameObject.y = dragY;
-      }
+      },
     );
 
     this.input.on(
@@ -152,7 +152,7 @@ export default class Game extends Phaser.Scene {
             (p.position.vertical === newPosition.vertical ||
               (p instanceof Pawn &&
                 this.selectedPiece instanceof Pawn &&
-                p.position.vertical + (p.white ? -1 : 1) === newPosition.vertical))
+                p.position.vertical + (p.white ? -1 : 1) === newPosition.vertical)),
         );
 
         if (this.invalidMove(newPosition)) {
@@ -176,14 +176,14 @@ export default class Game extends Phaser.Scene {
         }
 
         this.move(newPosition);
-      }
+      },
     );
   }
 
   private invalidMove(position: Position) {
     return !this.selectedPiece!.moves.some(
       (location) =>
-        location.vertical === position.vertical && location.horizontal === position.horizontal
+        location.vertical === position.vertical && location.horizontal === position.horizontal,
     );
   }
 
@@ -205,10 +205,10 @@ export default class Game extends Phaser.Scene {
     }
 
     const friendlyPositionsFiltered = friendlyPositions.filter(
-      (position): position is Position => position !== undefined
+      (position): position is Position => position !== undefined,
     );
     const enemyPositionsFiltered = enemyPositions.filter(
-      (position): position is Position => position !== undefined
+      (position): position is Position => position !== undefined,
     );
 
     this.enemyPieces.forEach((piece) => {
@@ -234,8 +234,8 @@ export default class Game extends Phaser.Scene {
         piece.moves.some(
           (position) =>
             position.horizontal === kingPosition.horizontal &&
-            position.vertical === kingPosition.vertical
-        )
+            position.vertical === kingPosition.vertical,
+        ),
     );
 
     if (inCheck) {

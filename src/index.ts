@@ -6,5 +6,5 @@ import GameScene from './scenes/game';
 new Phaser.Game(
   Object.assign(config, {
     scene: [GameScene],
-  })
+  }),
 );
