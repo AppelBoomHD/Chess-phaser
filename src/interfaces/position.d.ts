@@ -1,4 +1,4 @@
-export interface Position {
-  horizontal: number,
-  vertical: number
+export default interface Position {
+  horizontal: number;
+  vertical: number;
 }

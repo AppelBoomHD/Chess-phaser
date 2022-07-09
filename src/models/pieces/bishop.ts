@@ -1,31 +1,38 @@
-import { Position } from "../../interfaces/position";
-import { Base } from "./base";
-import { PIECE_NAME } from "../../environment";
+import PieceName from '../../interfaces/piecename';
+import Position from '../../interfaces/position';
+import Base from './base';
 
-export class Bishop extends Base {
+export default class Bishop extends Base {
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PIECE_NAME.BISHOP, white, position, []);
+    super(scene, PieceName.BISHOP, white, position, []);
   }
 
   protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {
     const possiblePositions: Position[] = [];
-    const plusminusArray = [-1, 1];
-    for (const plusminusX of plusminusArray) {
-      for (const plusminusY of plusminusArray) {
+    const signs = [-1, 1];
+    signs.forEach((signX) => {
+      signs.forEach((signY) => {
         let add = 1;
-        let position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY } as Position;
-        while (this.isInbound(position) && !this.isOccupied(position, friendlyPositions)) {
+        let position = {
+          horizontal: this.position.horizontal + add * signX,
+          vertical: this.position.vertical + add * signY,
+        } as Position;
+
+        while (Base.isInbound(position) && !Base.isOccupied(position, friendlyPositions)) {
           possiblePositions.push(position);
 
-          if (this.isOccupied(position, enemyPositions)) {
+          if (Base.isOccupied(position, enemyPositions)) {
             break;
           }
 
-          ++add;
-          position = { horizontal: this.position.horizontal + add * plusminusX, vertical: this.position.vertical + add * plusminusY };
+          add += 1;
+          position = {
+            horizontal: this.position.horizontal + add * signX,
+            vertical: this.position.vertical + add * signY,
+          };
         }
-      }
-    }
+      });
+    });
     return possiblePositions;
   }
 }

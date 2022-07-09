@@ -7,6 +7,6 @@ export default {
     width: +import.meta.env.VITE_SIZE_BOARD,
     height: +import.meta.env.VITE_SIZE_BOARD,
     mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  }
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
 } as Phaser.Types.Core.GameConfig;

@@ -1,60 +1,65 @@
-import { Scene } from "phaser";
-import { PIECE_NAME, SIZE_SQUARE } from "../../environment";
-import { CoordinateHelper } from "../../helpers/coordinateHelper";
-import { Coordinate } from "../../interfaces/coordinate";
-import { Position } from "../../interfaces/position";
+import { Scene } from 'phaser';
+import { SIZE_SQUARE } from '../../environment';
+import CoordinateHelper from '../../helpers/coordinateHelper';
+import Coordinate from '../../interfaces/coordinate';
+import PieceName from '../../interfaces/piecename';
+import Position from '../../interfaces/position';
 
-export abstract class Base {
+export default abstract class Base {
+  public id: number;
+
+  public white: boolean;
+
+  public position: Position;
+
+  public moves: Position[];
+
+  protected readonly gameObject: Phaser.GameObjects.Image;
+
   private static id = 0;
+
   private static group: Phaser.GameObjects.Group;
 
   private scene: Scene;
+
   private coordinate: Coordinate;
+
   private fullname: string;
+
   private lastMoves: Position[] = [];
 
-  private _gameObject: Phaser.GameObjects.Image;
-  private _id: number;
-  private _white: boolean;
-  private _position: Position;
-  private _moves: Position[];
-
-  constructor(scene: Scene, name: PIECE_NAME, white: boolean, position: Position, moves: Position[]) {
-    if (Base.id === 16) Base.id = 0;
-    this._moves = moves;
-    this._id = Base.id++;
+  constructor(
+    scene: Scene,
+    name: PieceName,
+    white: boolean,
+    position: Position,
+    moves: Position[]
+  ) {
+    this.id = Base.id;
+    if (Base.id >= 15) {
+      Base.id = 0;
+    } else {
+      Base.id += 1;
+    }
+    this.moves = moves;
     this.scene = scene;
     this.fullname = `${name}_${white ? 'white' : 'black'}`;
-    this._white = white;
-    this._position = position;
+    this.white = white;
+    this.position = position;
     this.coordinate = CoordinateHelper.getCoordinate(position);
-    this._gameObject = this.scene.add.sprite(this.coordinate.x, this.coordinate.y, this.fullname).setName(`${this.id}`);
+    this.gameObject = this.scene.add
+      .sprite(this.coordinate.x, this.coordinate.y, this.fullname)
+      .setName(`${this.id}`);
   }
 
-  get id() {
-    return this._id;
-  }
-
-  get white() {
-    return this._white;
-  }
-
-  get position() {
-    return this._position;
-  }
-
-  get moves() {
-    return this._moves;
-  }
-
-  protected get gameObject() {
-    return this._gameObject;
-  }
-
-  protected abstract possibleMovements(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position): Position[]
+  protected abstract possibleMovements(
+    friendlyPositions: Position[],
+    enemyPositions?: Position[],
+    doubleMovedPawn?: Position
+  ): Position[];
 
   move(toPosition: Position) {
-    this._position = toPosition;
+    this.position = toPosition;
     this.coordinate = CoordinateHelper.getCoordinate(toPosition);
     this.gameObject.setPosition(this.coordinate.x, this.coordinate.y);
   }
@@ -66,10 +71,22 @@ export abstract class Base {
   select() {
     this.gameObject.setTint(+import.meta.env.VITE_COLOR_TINT);
     Base.group = this.scene.add.group();
-    for (const position of this._moves) {
-      const coordinate = CoordinateHelper.getCoordinate({ horizontal: position.horizontal, vertical: position.vertical });
-      Base.group.add(this.scene.add.rectangle(coordinate.x, coordinate.y, SIZE_SQUARE, SIZE_SQUARE, +import.meta.env.VITE_COLOR_TINT, 0.25))
-    }
+    this.moves.forEach((position) => {
+      const coordinate = CoordinateHelper.getCoordinate({
+        horizontal: position.horizontal,
+        vertical: position.vertical,
+      });
+      Base.group.add(
+        this.scene.add.rectangle(
+          coordinate.x,
+          coordinate.y,
+          SIZE_SQUARE,
+          SIZE_SQUARE,
+          +import.meta.env.VITE_COLOR_TINT,
+          0.25
+        )
+      );
+    });
   }
 
   deselect() {
@@ -82,12 +99,12 @@ export abstract class Base {
   }
 
   setMoves(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position) {
-    this.lastMoves = this._moves;
-    this._moves = this.possibleMovements(friendlyPositions, enemyPositions, doubleMovedPawn);
+    this.lastMoves = this.moves;
+    this.moves = this.possibleMovements(friendlyPositions, enemyPositions, doubleMovedPawn);
   }
 
   setBackMoves() {
-    this._moves = this.lastMoves;
+    this.moves = this.lastMoves;
   }
 
   enableInteractive() {
@@ -98,11 +115,18 @@ export abstract class Base {
     this.gameObject.disableInteractive();
   }
 
-  protected isInbound(position: Position) {
-    return position.horizontal <= 8 && position.horizontal >= 1 && position.vertical <= 8 && position.vertical >= 1;
+  protected static isInbound(position: Position) {
+    return (
+      position.horizontal <= 8 &&
+      position.horizontal >= 1 &&
+      position.vertical <= 8 &&
+      position.vertical >= 1
+    );
   }
 
-  protected isOccupied(position: Position, occupiedPositions: Position[]) {
-    return occupiedPositions.some((pos) => pos.horizontal === position.horizontal && pos.vertical === position.vertical);
+  protected static isOccupied(position: Position, occupiedPositions: Position[]) {
+    return occupiedPositions.some(
+      (pos) => pos.horizontal === position.horizontal && pos.vertical === position.vertical
+    );
   }
 }

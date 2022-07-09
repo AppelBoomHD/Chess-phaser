@@ -1,16 +1,18 @@
-import { Position } from "../../interfaces/position";
-import { Base } from "./base";
-import { PIECE_NAME } from "../../environment";
+import PieceName from '../../interfaces/piecename';
+import Position from '../../interfaces/position';
+import Base from './base';
 
-export class Pawn extends Base {
+export default class Pawn extends Base {
   private firstmove = true;
 
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    const moves = white ? [
-      { ...position, vertical: position.vertical + 1 },
-      { ...position, vertical: position.vertical + 2 }
-    ] : [];
-    super(scene, PIECE_NAME.PAWN, white, position, moves);
+    const moves = white
+      ? [
+          { ...position, vertical: position.vertical + 1 },
+          { ...position, vertical: position.vertical + 2 },
+        ]
+      : [];
+    super(scene, PieceName.PAWN, white, position, moves);
   }
 
   override move(toPosition: Position) {
@@ -18,35 +20,52 @@ export class Pawn extends Base {
     super.move(toPosition);
   }
 
-  protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[], doubleMovedPawn?: Position) {
+  protected possibleMovements(
+    friendlyPositions: Position[],
+    enemyPositions: Position[],
+    doubleMovedPawn?: Position
+  ) {
     const possiblePositions: Position[] = [];
-
-    const position = this.add(0, 1);
-    if (this.isInbound(position) && !this.isOccupied(position, [...friendlyPositions, ...enemyPositions])) {
-      possiblePositions.push(position);
-      if (this.firstmove) {
-        const position = this.add(0, 2);
-        if (this.isInbound(position) && !this.isOccupied(position, [...friendlyPositions, ...enemyPositions])) {
-          possiblePositions.push(position);
-        }
-      }
+    const allPositions = [...friendlyPositions, ...enemyPositions];
+    this.add(1, possiblePositions, allPositions);
+    if (this.firstmove) {
+      this.add(2, possiblePositions, allPositions);
     }
 
-    for (const add of [-1, 1]) {
-      const position = this.add(add, 1);
-      if (this.isOccupied(position, enemyPositions) || this.canEnPassant(this.add(add, 0), doubleMovedPawn)) {
+    [-1, 1].forEach((add) => {
+      const position = {
+        horizontal: this.position.horizontal + add,
+        vertical: this.position.vertical + (this.white ? 1 : -1),
+      } as Position;
+      if (Base.isOccupied(position, enemyPositions) || this.canEnPassant(add, doubleMovedPawn)) {
         possiblePositions.push(position);
       }
-    }
+    });
 
     return possiblePositions;
   }
 
-  private canEnPassant(position: Position, doubleMovedPawn?: Position) {
-    return doubleMovedPawn && doubleMovedPawn.horizontal === position.horizontal && doubleMovedPawn.vertical === position.vertical
+  private canEnPassant(side: number, doubleMovedPawn?: Position) {
+    const position = {
+      horizontal: this.position.horizontal + side,
+      vertical: this.position.vertical,
+    } as Position;
+
+    return (
+      doubleMovedPawn &&
+      doubleMovedPawn.horizontal === position.horizontal &&
+      doubleMovedPawn.vertical === position.vertical
+    );
   }
 
-  private add(addX: number, addY: number) {
-    return { horizontal: this.position.horizontal + addX, vertical: this.position.vertical + addY * (this.white ? 1 : -1) };
+  private add(add: number, possiblePositions: Position[], allPositions: Position[]) {
+    const position = {
+      horizontal: this.position.horizontal,
+      vertical: this.position.vertical + add * (this.white ? 1 : -1),
+    } as Position;
+
+    if (Base.isInbound(position) && !Base.isOccupied(position, allPositions)) {
+      possiblePositions.push(position);
+    }
   }
 }
