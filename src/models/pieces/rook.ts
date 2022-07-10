@@ -3,8 +3,15 @@ import Position from '../../interfaces/position';
 import Base from './base';
 
 export default class Rook extends Base {
+  public firstMove = true;
+
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
     super(scene, PieceName.ROOK, white, position, []);
+  }
+
+  override move(toPosition: Position) {
+    if (this.firstMove) this.firstMove = false;
+    super.move(toPosition);
   }
 
   protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {

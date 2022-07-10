@@ -3,7 +3,7 @@ import Position from '../../interfaces/position';
 import Base from './base';
 
 export default class Pawn extends Base {
-  private firstmove = true;
+  private firstMove = true;
 
   constructor(scene: Phaser.Scene, white: boolean, position: Position) {
     const moves = white
@@ -16,7 +16,7 @@ export default class Pawn extends Base {
   }
 
   override move(toPosition: Position) {
-    if (this.firstmove) this.firstmove = false;
+    if (this.firstMove) this.firstMove = false;
     super.move(toPosition);
   }
 
@@ -28,7 +28,7 @@ export default class Pawn extends Base {
     const possiblePositions: Position[] = [];
     const allPositions = [...friendlyPositions, ...enemyPositions];
     this.add(1, possiblePositions, allPositions);
-    if (this.firstmove) {
+    if (this.firstMove) {
       this.add(2, possiblePositions, allPositions);
     }
 

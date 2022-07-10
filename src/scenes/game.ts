@@ -163,9 +163,7 @@ export default class Game extends Phaser.Scene {
         this.setMoves(enemyPiece, newPosition);
         if (this.isInCheck(enemyPiece, newPosition)) {
           this.enemyPieces.forEach((piece) => {
-            if (piece) {
-              piece.setBackMoves();
-            }
+            piece?.setBackMoves();
           });
           this.selectedPiece.moveBack();
           return;
@@ -190,6 +188,7 @@ export default class Game extends Phaser.Scene {
   private setMoves(enemyPiece: number, newPosition: Position) {
     const friendlyPositions = this.friendlyPieces.map((piece) => piece?.position);
     const enemyPositions = this.enemyPieces.map((piece) => piece?.position);
+
     let doubleMovedPawn: Position | undefined;
     if (
       this.selectedPiece instanceof Pawn &&
@@ -198,9 +197,15 @@ export default class Game extends Phaser.Scene {
       doubleMovedPawn = newPosition;
     }
 
+    const rooks = [
+      (this.friendlyPieces[8] as Rook).firstMove,
+      (this.friendlyPieces[15] as Rook).firstMove,
+    ];
+
     friendlyPositions[this.selectedPiece!.id] = newPosition;
 
-    if (enemyPiece >= -1) {
+    // check if enemy piece doesn't exist
+    if (enemyPiece <= -1) {
       enemyPositions[enemyPiece] = undefined;
     }
 
@@ -212,9 +217,7 @@ export default class Game extends Phaser.Scene {
     );
 
     this.enemyPieces.forEach((piece) => {
-      if (piece) {
-        piece.setMoves(enemyPositionsFiltered, friendlyPositionsFiltered, doubleMovedPawn);
-      }
+      piece?.setMoves(enemyPositionsFiltered, friendlyPositionsFiltered, doubleMovedPawn, rooks);
     });
   }
 
@@ -252,9 +255,26 @@ export default class Game extends Phaser.Scene {
   }
 
   private move(position: Position) {
+    this.castles(position);
     this.selectedPiece!.move(position);
     this.selectedPiece!.deselect();
     this.switchTurn();
+  }
+
+  private castles(position: Position) {
+    if (this.selectedPiece instanceof King) {
+      if (this.selectedPiece.position.horizontal - position.horizontal >= 2) {
+        this.friendlyPieces[8]?.move({
+          ...position,
+          horizontal: position.horizontal + 1,
+        });
+      } else if (this.selectedPiece.position.horizontal - position.horizontal <= -2) {
+        this.friendlyPieces[15]?.move({
+          ...position,
+          horizontal: position.horizontal - 1,
+        });
+      }
+    }
   }
 
   private switchTurn() {

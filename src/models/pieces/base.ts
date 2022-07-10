@@ -56,6 +56,7 @@ export default abstract class Base {
     friendlyPositions: Position[],
     enemyPositions?: Position[],
     doubleMovedPawn?: Position,
+    rooks?: boolean[],
   ): Position[];
 
   move(toPosition: Position) {
@@ -98,9 +99,14 @@ export default abstract class Base {
     this.gameObject.destroy(true);
   }
 
-  setMoves(friendlyPositions: Position[], enemyPositions?: Position[], doubleMovedPawn?: Position) {
+  setMoves(
+    friendlyPositions: Position[],
+    enemyPositions?: Position[],
+    doubleMovedPawn?: Position,
+    rooks?: boolean[],
+  ) {
     this.lastMoves = this.moves;
-    this.moves = this.possibleMovements(friendlyPositions, enemyPositions, doubleMovedPawn);
+    this.moves = this.possibleMovements(friendlyPositions, enemyPositions, doubleMovedPawn, rooks);
   }
 
   setBackMoves() {
