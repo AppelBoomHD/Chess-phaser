@@ -155,13 +155,8 @@ export default class Game extends Phaser.Scene {
                 p.position.vertical + (p.white ? -1 : 1) === newPosition.vertical)),
         );
 
-        if (this.invalidMove(newPosition)) {
-          this.selectedPiece.moveBack();
-          return;
-        }
-
         this.setMoves(enemyPiece, newPosition);
-        if (this.isInCheck(enemyPiece, newPosition)) {
+        if (this.invalidMove(enemyPiece, newPosition)) {
           this.enemyPieces.forEach((piece) => {
             piece?.setBackMoves();
           });
@@ -178,10 +173,22 @@ export default class Game extends Phaser.Scene {
     );
   }
 
-  private invalidMove(position: Position) {
-    return !this.selectedPiece!.moves.some(
+  private invalidMove(enemyPiece: number, position: Position) {
+    return (
+      !this.selectedPiece!.moves.some(
       (location) =>
         location.vertical === position.vertical && location.horizontal === position.horizontal,
+      ) ||
+      this.isInCheck(enemyPiece, position) ||
+      (this.selectedPiece instanceof King &&
+        Math.abs(this.selectedPiece.position.horizontal - position.horizontal) >= 2 &&
+        (this.isInCheck(-1, {
+          ...this.selectedPiece.position,
+          horizontal:
+            position.horizontal +
+            (this.selectedPiece.position.horizontal - position.horizontal) / 2,
+        }) ||
+          this.isInCheck(-1, this.selectedPiece.position)))
     );
   }
 
@@ -205,7 +212,7 @@ export default class Game extends Phaser.Scene {
     friendlyPositions[this.selectedPiece!.id] = newPosition;
 
     // check if enemy piece doesn't exist
-    if (enemyPiece <= -1) {
+    if (enemyPiece >= 0) {
       enemyPositions[enemyPiece] = undefined;
     }
 
@@ -255,20 +262,21 @@ export default class Game extends Phaser.Scene {
   }
 
   private move(position: Position) {
+    if (this.selectedPiece instanceof King) {
     this.castles(position);
+    }
     this.selectedPiece!.move(position);
     this.selectedPiece!.deselect();
     this.switchTurn();
   }
 
   private castles(position: Position) {
-    if (this.selectedPiece instanceof King) {
-      if (this.selectedPiece.position.horizontal - position.horizontal >= 2) {
+    if (this.selectedPiece!.position.horizontal - position.horizontal >= 2) {
         this.friendlyPieces[8]?.move({
           ...position,
           horizontal: position.horizontal + 1,
         });
-      } else if (this.selectedPiece.position.horizontal - position.horizontal <= -2) {
+    } else if (this.selectedPiece!.position.horizontal - position.horizontal <= -2) {
         this.friendlyPieces[15]?.move({
           ...position,
           horizontal: position.horizontal - 1,

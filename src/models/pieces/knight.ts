@@ -3,7 +3,7 @@ import Position from '../../interfaces/position';
 import Base from './base';
 
 export default class Knight extends Base {
-  constructor(scene: Phaser.Scene, white: boolean, right: boolean, position: Position) {
+  constructor(id: number, scene: Phaser.Scene, white: boolean, right: boolean, position: Position) {
     const moves = white
       ? [
           {
@@ -16,7 +16,14 @@ export default class Knight extends Base {
           },
         ]
       : [];
-    super(scene, right ? PieceName.KNIGHT_RIGHT : PieceName.KNIGHT_LEFT, white, position, moves);
+    super(
+      id,
+      scene,
+      right ? PieceName.KNIGHT_RIGHT : PieceName.KNIGHT_LEFT,
+      white,
+      position,
+      moves,
+    );
   }
 
   protected possibleMovements(friendlyPositions: Position[]) {

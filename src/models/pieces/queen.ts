@@ -3,8 +3,8 @@ import Position from '../../interfaces/position';
 import Base from './base';
 
 export default class Queen extends Base {
-  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PieceName.QUEEN, white, position, []);
+  constructor(id: number, scene: Phaser.Scene, white: boolean, position: Position) {
+    super(id, scene, PieceName.QUEEN, white, position, []);
   }
 
   protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {

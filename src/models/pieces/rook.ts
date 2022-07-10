@@ -5,8 +5,8 @@ import Base from './base';
 export default class Rook extends Base {
   public firstMove = true;
 
-  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PieceName.ROOK, white, position, []);
+  constructor(id: number, scene: Phaser.Scene, white: boolean, position: Position) {
+    super(id, scene, PieceName.ROOK, white, position, []);
   }
 
   override move(toPosition: Position) {

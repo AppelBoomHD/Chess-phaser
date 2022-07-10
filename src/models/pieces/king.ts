@@ -5,8 +5,8 @@ import Base from './base';
 export default class King extends Base {
   public firstMove = true;
 
-  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PieceName.KING, white, position, []);
+  constructor(id: number, scene: Phaser.Scene, white: boolean, position: Position) {
+    super(id, scene, PieceName.KING, white, position, []);
   }
 
   override move(toPosition: Position) {
@@ -16,7 +16,7 @@ export default class King extends Base {
 
   protected possibleMovements(
     friendlyPositions: Position[],
-    _enemyPositions: Position[],
+    enemyPositions: Position[],
     _doubleMovedPawn: Position,
     rooks: boolean[],
   ) {
@@ -38,18 +38,19 @@ export default class King extends Base {
 
     if (this.firstMove) {
       const pos = { vertical: this.white ? 1 : 8 };
+      const allPositions = [...friendlyPositions, ...enemyPositions];
       if (
         rooks[this.white ? 0 : 1] &&
-        !Base.isOccupied({ horizontal: 2, ...pos }, friendlyPositions) &&
-        !Base.isOccupied({ horizontal: 3, ...pos }, friendlyPositions) &&
-        !Base.isOccupied({ horizontal: 4, ...pos }, friendlyPositions)
+        !Base.isOccupied({ horizontal: 2, ...pos }, allPositions) &&
+        !Base.isOccupied({ horizontal: 3, ...pos }, allPositions) &&
+        !Base.isOccupied({ horizontal: 4, ...pos }, allPositions)
       ) {
         possibleMovements.push({ horizontal: 3, ...pos });
       }
       if (
         rooks[this.white ? 1 : 0] &&
-        !Base.isOccupied({ horizontal: 6, ...pos }, friendlyPositions) &&
-        !Base.isOccupied({ horizontal: 7, ...pos }, friendlyPositions)
+        !Base.isOccupied({ horizontal: 6, ...pos }, allPositions) &&
+        !Base.isOccupied({ horizontal: 7, ...pos }, allPositions)
       ) {
         possibleMovements.push({ horizontal: 7, ...pos });
       }

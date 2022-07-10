@@ -5,14 +5,14 @@ import Base from './base';
 export default class Pawn extends Base {
   private firstMove = true;
 
-  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
+  constructor(id: number, scene: Phaser.Scene, white: boolean, position: Position) {
     const moves = white
       ? [
           { ...position, vertical: position.vertical + 1 },
           { ...position, vertical: position.vertical + 2 },
         ]
       : [];
-    super(scene, PieceName.PAWN, white, position, moves);
+    super(id, scene, PieceName.PAWN, white, position, moves);
   }
 
   override move(toPosition: Position) {

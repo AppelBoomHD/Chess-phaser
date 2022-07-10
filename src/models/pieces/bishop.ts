@@ -3,8 +3,8 @@ import Position from '../../interfaces/position';
 import Base from './base';
 
 export default class Bishop extends Base {
-  constructor(scene: Phaser.Scene, white: boolean, position: Position) {
-    super(scene, PieceName.BISHOP, white, position, []);
+  constructor(id: number, scene: Phaser.Scene, white: boolean, position: Position) {
+    super(id, scene, PieceName.BISHOP, white, position, []);
   }
 
   protected possibleMovements(friendlyPositions: Position[], enemyPositions: Position[]) {
