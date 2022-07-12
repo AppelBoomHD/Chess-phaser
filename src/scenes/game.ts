@@ -162,13 +162,15 @@ export default class Game extends Phaser.Scene {
             p.position.vertical === newPosition.vertical,
         );
 
-        const passedPawn = this.enemyPieces.findIndex(
-          (p) =>
-            p instanceof Pawn &&
-            p.position.horizontal === newPosition.horizontal &&
-            this.selectedPiece instanceof Pawn &&
-            p.position.vertical + (p.white ? -1 : 1) === newPosition.vertical,
-        );
+        let passedPawn = -1;
+        if (this.selectedPiece instanceof Pawn) {
+          passedPawn = this.enemyPieces.findIndex(
+            (p) =>
+              p instanceof Pawn &&
+              p.position.horizontal === newPosition.horizontal &&
+              p.position.vertical + (p.white ? -1 : 1) === newPosition.vertical,
+          );
+        }
 
         this.setMoves(enemyPiece, newPosition);
         if (this.invalidMove(enemyPiece, newPosition)) {
