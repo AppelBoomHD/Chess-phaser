@@ -16,8 +16,6 @@ export default abstract class Base {
 
   protected readonly gameObject: Phaser.GameObjects.Image;
 
-  private static id = 0;
-
   private static group: Phaser.GameObjects.Group;
 
   private scene: Scene;
@@ -29,18 +27,14 @@ export default abstract class Base {
   private lastMoves: Position[] = [];
 
   constructor(
+    id: number,
     scene: Scene,
     name: PieceName,
     white: boolean,
     position: Position,
     moves: Position[],
   ) {
-    this.id = Base.id;
-    if (Base.id >= 15) {
-      Base.id = 0;
-    } else {
-      Base.id += 1;
-    }
+    this.id = id;
     this.moves = moves;
     this.scene = scene;
     this.fullname = `${name}_${white ? 'white' : 'black'}`;
