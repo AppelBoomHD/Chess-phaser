@@ -235,8 +235,8 @@ export default class Game extends Phaser.Scene {
     }
 
     const rooks = [
-      (this.friendlyPieces[8] as Rook).firstMove,
-      (this.friendlyPieces[15] as Rook).firstMove,
+      (this.friendlyPieces[8] as Rook)?.firstMove ?? false,
+      (this.friendlyPieces[15] as Rook)?.firstMove ?? false,
     ];
 
     friendlyPositions[this.selectedPiece!.id] = newPosition;
