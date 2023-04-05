@@ -12,6 +12,8 @@ import Queen from '../models/pieces/queen';
 import Rook from '../models/pieces/rook';
 
 export default class Game extends Phaser.Scene {
+  private whitesTurn = true;
+
   private selectedPiece?: Base;
 
   private friendlyPieces: (Base | undefined)[] = [];
@@ -40,7 +42,7 @@ export default class Game extends Phaser.Scene {
   private loadSvgs(white: boolean) {
     Object.values(PieceName).forEach((piece) => {
       const name = `${piece}${white ? '_white' : '_black'}`;
-      this.load.svg(name, `assets/${name}.svg`, { scale: SIZE_PIECE });
+      this.load.svg(name, `/assets/${name}.svg`, { scale: SIZE_PIECE });
     });
   }
 
@@ -49,8 +51,8 @@ export default class Game extends Phaser.Scene {
       .grid(
         +import.meta.env.VITE_SIZE_BOARD / 2,
         +import.meta.env.VITE_SIZE_BOARD / 2,
-        +import.meta.env.VITE_SIZE_BOARD,
-        +import.meta.env.VITE_SIZE_BOARD,
+        +import.meta.env.VITE_SIZE_BOARD - 1,
+        +import.meta.env.VITE_SIZE_BOARD - 1,
         SIZE_SQUARE,
         SIZE_SQUARE,
         +import.meta.env.VITE_COLOR_WHITE_SQUARE,
@@ -325,18 +327,22 @@ export default class Game extends Phaser.Scene {
     const white = this.selectedPiece!.white ? 'white' : 'black';
     const queen = this.add
       .image(0.5 * SIZE_SQUARE, 0.5 * SIZE_SQUARE, `queen_${white}`)
+      .setFlipY(!this.whitesTurn)
       .setInteractive({ useHandCursor: true })
       .setName('queen');
     const rook = this.add
       .image(1.5 * SIZE_SQUARE, 0.5 * SIZE_SQUARE, `rook_${white}`)
+      .setFlipY(!this.whitesTurn)
       .setInteractive({ useHandCursor: true })
       .setName('rook');
     const knight = this.add
       .image(0.5 * SIZE_SQUARE, 1.5 * SIZE_SQUARE, `knight_left_${white}`)
+      .setFlipY(!this.whitesTurn)
       .setInteractive({ useHandCursor: true })
       .setName('knight');
     const bishop = this.add
       .image(1.5 * SIZE_SQUARE, 1.5 * SIZE_SQUARE, `bishop_${white}`)
+      .setFlipY(!this.whitesTurn)
       .setInteractive({ useHandCursor: true })
       .setName('bishop');
 
@@ -390,6 +396,16 @@ export default class Game extends Phaser.Scene {
     this.friendlyPieces = this.enemyPieces;
     this.enemyPieces = enemyPieces;
 
+    this.flipBoard();
     this.activatePieces();
+
+    this.whitesTurn = !this.whitesTurn;
+  }
+
+  private flipBoard() {
+    this.cameras.main.setRotation(this.whitesTurn ? Math.PI : 0);
+    this.children.list.forEach((gameObject: Phaser.GameObjects.GameObject) => {
+      if (gameObject instanceof Phaser.GameObjects.Sprite) gameObject.setFlipY(this.whitesTurn);
+    });
   }
 }
