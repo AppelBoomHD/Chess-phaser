@@ -1,7 +1,7 @@
 {
   "name": "chess-phaser",
   "version": "1.1.0",
-  "description": "Chess build with Phaser",
+  "description": "Chess built with Phaser",
   "main": "dist/index.js",
   "scripts": {
     "start": "npm run dev",
