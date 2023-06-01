@@ -1,6 +1,6 @@
 # Chess-phaser
 
-![icon](/public/apple-touch-icon.png)
+[![icon](/public/apple-touch-icon.png)](https://chess.juulsoft.com)
 
 > This is a Chess game made using [Phaser 3](https://github.com/photonstorm/phaser) with [TypeScript](https://www.typescriptlang.org/) implementing [Object-Oriented Programming](https://en.wikipedia.org/wiki/Object-oriented_programming)
 
