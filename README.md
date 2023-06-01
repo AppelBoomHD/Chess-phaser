@@ -1,21 +1,17 @@
-<h1 align="center">
-  <br>
-  <a href="https://github.com/geocine/phaser3-rollup-typescript#readme"><img src="https://i.imgur.com/6lcIxDs.png" alt="header" width="600"/></a>
-  <br>
-  Chess (Made with Phaser 3 & TypeScript)
-  <br>
-</h1>
+# Chess-phaser
 
-This is a Chess game made using [Phaser 3](https://github.com/photonstorm/phaser) with [TypeScript](https://www.typescriptlang.org/), [Rollup](https://rollupjs.org) with ⚡️ lightning fast HMR through [Vite](https://vitejs.dev/).
+![icon](/public/apple-touch-icon.png)
+
+> This is a Chess game made using [Phaser 3](https://github.com/photonstorm/phaser) with [TypeScript](https://www.typescriptlang.org/) implementing [Object-Oriented Programming](https://en.wikipedia.org/wiki/Object-oriented_programming)
 
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install project dependencies |
+| Command                     | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| `npm install`               | Install project dependencies                             |
 | `npm start` / `npm run dev` | Builds project and open web server, watching for changes |
-| `npm run build` | Builds code bundle with production settings  |
-| `npm serve` | Run a web server to serve built code bundle |
+| `npm run build`             | Builds code bundle with production settings              |
+| `npm serve`                 | Run a web server to serve built code bundle              |
 
 ## Development
 
